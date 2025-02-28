@@ -1,7 +1,7 @@
 'use client'
-import React, { useState, useEffect } from 'react'
+import React, { Suspense, useState, useEffect } from 'react'
 import AsyncSelect from 'react-select/async'
-import { searchUsers} from '@/app/actions/actions'
+import { searchUsers, updateUser } from '@/app/actions/actions'
 import UserCard from './user-card'
 import { User } from '@/app/actions/schemas'
 import EditUserModal from './edit-user-modal'
@@ -12,27 +12,31 @@ interface Option {
   user: User;
 }
 
-export default function UserSearch() {
+interface UserSearchProps {
+  users: User[];
+}
+
+export default function UserSearch({ users }: UserSearchProps) {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
 
+  // Filter users locally instead of making an API call
   const loadOptions = async (inputValue: string): Promise<Option[]> => {
-    const users = await searchUsers(inputValue);
-    return users.map(user => ({
+    const filteredUsers = users.filter(user =>
+      user.name.toLowerCase().startsWith(inputValue.toLowerCase())
+    );
+
+    return filteredUsers.map(user => ({
       value: user.id,
       label: user.name,
-      user: user, // Ensure user is defined
+      user: user,
     }));
-  }
+  };
 
   const handleChange = (option: Option | null) => {
-    if (option && option.user) {
-      setSelectedUser(option.user);
-    } else {
-      setSelectedUser(null);
-    }
-  }
+    setSelectedUser(option?.user || null);
+  };
 
   const handleEdit = (user: User) => {
     console.log('Editing user:', user);
@@ -60,11 +64,7 @@ export default function UserSearch() {
     } catch (error) {
       console.error('Error updating user:', error);
     }
-  }
-
-  useEffect(() => {
-    console.log('Selected user:', selectedUser);
-  }, [selectedUser]);
+  };
 
   return (
     <div className="space-y-6">
@@ -75,12 +75,7 @@ export default function UserSearch() {
         placeholder="Search for a user..."
         className="w-full max-w-md mx-auto"
       />
-      {selectedUser && (
-        <UserCard 
-          user={selectedUser}
-          onEdit={handleEdit}
-        />
-      )}
+      {selectedUser && <UserCard user={selectedUser} onEdit={handleEdit} />}
       {showEditModal && editingUser && (
         <EditUserModal
           user={editingUser}

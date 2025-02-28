@@ -1,0 +1,22 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // Make sure to set this in your environment variables
+}
+
+model User {
+  id          String  @id @default(cuid()) // Auto-generates a unique ID for each user
+  name        String  @db.VarChar(255)     // String field with a minimum length constraint enforced by application logic
+  email       String  @unique              // Email must be unique
+  phoneNumber String  @db.VarChar(10)      // Australian mobile numbers, e.g., "0422018632"
+}

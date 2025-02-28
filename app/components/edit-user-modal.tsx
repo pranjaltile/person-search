@@ -16,7 +16,7 @@ const EditUserModal: React.FC<EditUserModalProps> = ({ user, onSave, onClose }) 
       };
     
       const handleSave = () => {
-        onSave(formData); // Call onSave with updated data
+        onSave(formData); 
       };
 
 
