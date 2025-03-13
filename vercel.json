@@ -3,7 +3,10 @@
     "buildCommand": "npm run build",
     "installCommand": "npm install --force",
     "framework": "nextjs",
-    "outputDirectory": ".next"
+    "outputDirectory": ".next",
+    "builds": [
+      { "src": "package.json", "use": "@vercel/next" }
+    ]
   }
   
   
